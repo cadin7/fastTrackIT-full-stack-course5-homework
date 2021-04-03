@@ -9,11 +9,10 @@ import ro.fasttrackit.homework5.repository.CountryRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.TreeMap;
 
 import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toUnmodifiableList;
+import static java.util.stream.Collectors.*;
 
 @Service
 public class CountryService {
@@ -30,30 +29,22 @@ public class CountryService {
         countryReader.readCountries().forEach(countryRepository::save);
     }
 
-    public List<Country> getAllCountries() {
+    private List<Country> getAllCountries() {
         return unmodifiableList(countryRepository.findAll());
     }
 
-    public Optional<Country> getCountry(long countryId) {
-        return countryRepository.findAll()
-                .stream()
-                .filter(country -> country.getId() == countryId)
-                .findFirst();
-    }
-
     public List<String> getAllCountryNames() {
-        return countryRepository.findAll()
-                .stream()
+        return getAllCountries().stream()
                 .map(Country::getName)
                 .collect(toUnmodifiableList());
     }
 
     public String getCapitalOfCountry(Long countryId) {
-        return getCountryByID(countryId).getCapital();
+        return getCountry(countryId).getCapital();
     }
 
-    private Country getCountryByID(Long countryId) {
-        return countryRepository.findAll()
+    private Country getCountry(Long countryId) {
+        return getAllCountries()
                 .stream()
                 .filter(country -> Objects.equals(country.getId(), countryId))
                 .findFirst()
@@ -61,53 +52,64 @@ public class CountryService {
     }
 
     public long getPopulationOfCountry(Long countryId) {
-        return getCountryByID(countryId).getPopulation();
+        return getCountry(countryId).getPopulation();
     }
 
-    public List<Country> getCountriesByContinent(String continentName) {
-        return getCountriesByContinentName(continentName);
+    public List<Country> getContinentCountries(String continentName, Long minPopulation) {
+        return minPopulation == null ?
+                getCountriesByContinentName(continentName) :
+                getCountriesOnContinentWithMinPopulation(continentName, minPopulation);
     }
 
     private List<Country> getCountriesByContinentName(String continentName) {
-        return countryRepository.findAll()
+        return getAllCountries()
                 .stream()
                 .filter(country -> country.getContinent().equalsIgnoreCase(continentName))
                 .collect(toUnmodifiableList());
     }
 
+    private List<Country> getCountriesOnContinentWithMinPopulation(String continentName, Long minPopulation) {
+        return getCountriesByContinentName(continentName).stream()
+                .filter(country -> country.getPopulation() >= minPopulation)
+                .collect(toUnmodifiableList());
+    }
+
     public List<String> getNeighboursOfCountry(Long countryId) {
-        return getCountryByID(countryId).getNeighbours()
+        return getCountry(countryId).getNeighbours()
                 .stream()
                 .map(Neighbour::toString)
                 .collect(toUnmodifiableList());
     }
 
-    public List<Country> getCountriesOnContinentWithMinPopulation(String continentName, long population) {
-        return getCountriesByContinentName(continentName).stream()
-                .filter(country -> country.getPopulation() >= population)
-                .collect(toUnmodifiableList());
-    }
-
-    public List<Country> getCountriesByNeighbours(String includeNeighbour, String excludeNeighbour) {
-        return countryRepository.findAll()
+    public List<Country> getCountriesByNeighbours(String includedNeighbour, String excludedNeighbour) {
+        return getAllCountries()
                 .stream()
-                .filter(country -> isNeighbour(country, includeNeighbour, excludeNeighbour))
+                .filter(country -> isNeighbour(country, includedNeighbour, excludedNeighbour))
                 .collect(toUnmodifiableList());
     }
 
-    private boolean isNeighbour(Country country, String includeNeighbour, String excludeNeighbour) {
-        //TODO: Extract?
-        Predicate<Country> countryPredicate =
-                c -> c.getNeighbours().contains(includeNeighbour.toUpperCase()) &&
-                        !c.getNeighbours().contains(excludeNeighbour.toUpperCase());
-        return countryPredicate.test(country);
+    private boolean isNeighbour(Country country, String includedNeighbour, String excludedNeighbour) {
+        List<String> neighboursOfCountry = getNeighboursOfCountry(country.getId());
+        return neighboursOfCountry.contains(includedNeighbour.toUpperCase()) &&
+                !neighboursOfCountry.contains(excludedNeighbour.toUpperCase());
     }
 
     public Map<String, Long> getCountryToPopulationMap() {
-        return null;
+        return getAllCountries().stream()
+                .collect(toMap(
+                        Country::getName,
+                        Country::getPopulation,
+                        Math::addExact,
+                        TreeMap::new
+                ));
     }
 
     public Map<String, List<Country>> getContinentToCountriesMap() {
-        return null;
+        return getAllCountries().stream()
+                .collect(groupingBy(
+                        Country::getContinent,
+                        TreeMap::new,
+                        toUnmodifiableList()
+                ));
     }
 }

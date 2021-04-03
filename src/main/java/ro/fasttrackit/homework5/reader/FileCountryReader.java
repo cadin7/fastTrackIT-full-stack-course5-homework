@@ -12,6 +12,7 @@ import java.util.List;
 
 import static java.lang.Long.parseLong;
 import static java.nio.file.Files.lines;
+import static java.nio.file.Path.of;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
@@ -27,7 +28,7 @@ public class FileCountryReader implements CountryReader {
     @Override
     public List<Country> readCountries() {
         try {
-            return lines(Path.of(fileConfig.getFilePath()))
+            return lines(of(fileConfig.getFilePath()))
                     .map(this::readCountry)
                     .collect(toList());
         } catch (IOException e) {

@@ -1,23 +1,18 @@
 package ro.fasttrackit.homework5.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 import javax.validation.constraints.NotBlank;
 
-@Configuration
 @ConfigurationProperties(prefix = "country")
-@Validated
+@ConstructorBinding
+@AllArgsConstructor
+@Getter
 public class CountryFileConfig {
     @NotBlank
-    private String filePath;
+    private final String filePath;
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
 }

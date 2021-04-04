@@ -1,9 +1,6 @@
 package ro.fasttrackit.homework5.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -16,8 +13,7 @@ import static java.util.Optional.ofNullable;
 import static javax.persistence.CascadeType.ALL;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Validated

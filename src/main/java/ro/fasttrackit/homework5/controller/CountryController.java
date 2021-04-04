@@ -18,9 +18,9 @@ public class CountryController {
     }
 
     @GetMapping()
-    public List<Country> getAllCountries(@RequestParam(required = false) String includedNeighbour,
-                                         @RequestParam(required = false) String excludedNeighbour) {
-        return countryService.getCountries(includedNeighbour, excludedNeighbour);
+    public List<Country> getAllCountries(@RequestParam(required = false) String includeNeighbour,
+                                         @RequestParam(required = false) String excludeNeighbour) {
+        return countryService.getCountries(includeNeighbour, excludeNeighbour);
     }
 
     @GetMapping("/names")

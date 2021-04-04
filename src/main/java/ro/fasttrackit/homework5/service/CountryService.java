@@ -22,10 +22,10 @@ public class CountryService {
     private CountryService(CountryReader countryReader, CountryRepository countryRepository) {
         this.countryReader = countryReader;
         this.countryRepository = countryRepository;
-        saveCountry();
+        saveCountries();
     }
 
-    private void saveCountry() {
+    private void saveCountries() {
         countryReader.readCountries().forEach(countryRepository::save);
     }
 
@@ -77,7 +77,7 @@ public class CountryService {
     public List<String> getNeighboursOfCountry(Long countryId) {
         return getCountry(countryId).getNeighbours()
                 .stream()
-                .map(Neighbour::toString)
+                .map(Neighbour::getNeighbour)
                 .collect(toUnmodifiableList());
     }
 
@@ -122,6 +122,6 @@ public class CountryService {
         return getAllCountries().stream()
                 .filter(country -> country.getName().equalsIgnoreCase(countryName))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No country found with the name: " + countryName));
+                .orElseThrow(() -> new RuntimeException("No country found with name: " + countryName));
     }
 }

@@ -1,5 +1,6 @@
 package ro.fasttrackit.homework5.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ro.fasttrackit.homework5.domain.Country;
 import ro.fasttrackit.homework5.service.CountryService;
@@ -19,7 +20,7 @@ public class CountryController {
     @GetMapping()
     public List<Country> getAllCountries(@RequestParam(required = false) String includedNeighbour,
                                          @RequestParam(required = false) String excludedNeighbour) {
-        return countryService.getCountriesByNeighbours(includedNeighbour, excludedNeighbour);
+        return countryService.getCountries(includedNeighbour, excludedNeighbour);
     }
 
     @GetMapping("/names")
@@ -45,5 +46,11 @@ public class CountryController {
     @GetMapping("/population")
     public Map<String, Long> getCountryToPopulationMap(){
         return countryService.getCountryToPopulationMap();
+    }
+
+    @GetMapping(value = "/mine")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Country client(@RequestHeader(value="X-Country", defaultValue = "Romania") String country) {
+        return countryService.getMyCountry(country);
     }
 }

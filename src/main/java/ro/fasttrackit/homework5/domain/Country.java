@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
+import static javax.persistence.CascadeType.ALL;
 
 @Entity
 @Getter
@@ -39,7 +40,7 @@ public class Country {
     @NotBlank
     private String continent;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = ALL)
     private List<Neighbour> neighbours;
 
     public Country(String name, String capital, long population, long area, String continent,

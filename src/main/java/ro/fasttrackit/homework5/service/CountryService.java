@@ -81,7 +81,12 @@ public class CountryService {
                 .collect(toUnmodifiableList());
     }
 
-    public List<Country> getCountriesByNeighbours(String includedNeighbour, String excludedNeighbour) {
+    public List<Country> getCountries(String includedNeighbour, String excludedNeighbour) {
+        return includedNeighbour == null && excludedNeighbour == null ?
+                getAllCountries() : getCountriesByNeighbours(includedNeighbour, excludedNeighbour);
+    }
+
+    private List<Country> getCountriesByNeighbours(String includedNeighbour, String excludedNeighbour) {
         return getAllCountries()
                 .stream()
                 .filter(country -> isNeighbour(country, includedNeighbour, excludedNeighbour))
@@ -111,5 +116,12 @@ public class CountryService {
                         TreeMap::new,
                         toUnmodifiableList()
                 ));
+    }
+
+    public Country getMyCountry(String countryName){
+        return getAllCountries().stream()
+                .filter(country -> country.getName().equalsIgnoreCase(countryName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No country found with the name: " + countryName));
     }
 }
